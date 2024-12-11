@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 
 function App() {
@@ -19,10 +19,13 @@ function App() {
     }))
   }
 
-  const calculateScore = (e) => {
-    e.preventDefault()
-    console.log(formData)
-    
+  useEffect(() => {
+    if (formData.skdScore !== '') {
+      calculateScore()
+    }
+  }, [formData])
+
+  const calculateScore = () => {
     // Convert inputs to numbers
     const skbCatQuestions = parseFloat(formData.skbCatQuestions)
     const skd = Math.min(parseFloat(formData.skdScore) || 0, 550)
@@ -34,8 +37,7 @@ function App() {
     const skdComponent = (skd / 550) * 40
 
     // Calculate average of SKB components (60% weight)
-    const skbAverage = ((skbCatTotal / (skbCatQuestions*5) * 50+ skbPraktik/100 * 40 + skbWawancara/100 * 10) )
-    console.log(skbCatTotal/(skbCatQuestions*5))
+    const skbAverage = ((skbCatTotal / (skbCatQuestions*5) * 50 + skbPraktik/100 * 40 + skbWawancara/100 * 10))
     const skbComponent = (skbAverage / 100) * 60
 
     // Calculate final score
@@ -51,7 +53,7 @@ function App() {
   return (
     <div className="calculator-container">
       <h1>Kalkulator Nilai CPNS</h1>
-      <form onSubmit={calculateScore}>
+      <form onSubmit={(e) => e.preventDefault()}>
         <div className="form-section">
           <h2>SKD (Bobot 40%)</h2>
           <div className="input-group">
@@ -127,24 +129,22 @@ function App() {
             </label>
           </div>
         </div>
-
-        <button type="submit" className="calculate-btn">Hitung Nilai</button>
       </form>
 
-      {result && (
+      { (
         <div className="result-section">
           <h2>Hasil Perhitungan</h2>
           <div className="result-item">
             <span>Komponen SKD (40%):</span>
-            <span>{result.skdComponent}%</span>
+            <span>{result?.skdComponent || '0.0000'}%</span>
           </div>
           <div className="result-item">
             <span>Komponen SKB (60%):</span>
-            <span>{result.skbComponent}%</span>
+            <span>{result?.skbComponent || '0.0000'}%</span>
           </div>
           <div className="result-item total">
             <span>Nilai Akhir:</span>
-            <span>{result.finalScore}%</span>
+            <span>{result?.finalScore || '0.0000'}%</span>
           </div>
         </div>
       )}
